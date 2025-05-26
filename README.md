@@ -1,1 +1,1 @@
-# Chain-of-Grounded-Objectives: Concise-Goal-oriented-Prompting-for-Code-Generation
+# CGO: Concise-Goal-oriented-Prompting-for-Code-Generation
