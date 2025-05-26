@@ -1,25 +1,6 @@
 # Chain of Grounded Objectives
 
-This repository provides a framework for evaluating and benchmarking large language models (LLMs) on code generation and reasoning tasks using a modular, chain-based approach. It supports flexible configuration, experiment management, and result summarization for various models and datasets.
-
-## Features
-
-- Modular experiment pipeline for LLM evaluation
-- Support for multiple datasets (e.g., HumanEval, MBPP, LiveCodeBench)
-- Easy configuration of models and experiments via YAML files
-- Automated result aggregation and summarization
-- Docker support for reproducible environments
-
-## Directory Structure
-
-- `run.py` — Main entry point for running generators and evaluators
-- `main_result_summurize.py` — Aggregates and summarizes experiment results
-- `configs/` — Experiment, model, and data source configuration files
-- `data/` — Datasets (e.g., `mbpp_data.json`, `humaneval_data.json`)
-- `process/` — Experiment scripts and processing utilities
-- `third_party/expand_langchain/` — Core framework for chaining, evaluation, and generation
-- `templates/` — Prompt and evaluation templates
-- `api_keys.json` — API keys and endpoint configuration
+Official implementation of the paper 'Chain-of-Grounded-Objectives: Concise-Goal-oriented-Prompting-for-Code-Generation'.
 
 ## Installation
 
@@ -48,11 +29,6 @@ You can run experiments using the provided shell scripts or directly via `run.py
 
 ```bash
 python3 run.py generator --config_path=<path_to_config.yaml> run merge_json exit
-```
-
-Example (from a script):
-```bash
-bash process/llama3.1_8b/llama3.1_8b_live_test.sh
 ```
 
 ### Summarizing Results
