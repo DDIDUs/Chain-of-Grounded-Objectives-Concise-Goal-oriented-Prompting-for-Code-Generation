@@ -1,0 +1,126 @@
+source:
+  - name: Mbpp
+    type: json
+    kwargs:
+      path: data/mbpp_data.json
+      sort_key: id
+
+dataset:
+  - name: target
+    type: dict
+    kwargs:
+      primary_key: id
+      fields:
+        - name: id
+          source: Mbpp
+          key: id
+        - name: gold_tc
+          source: Mbpp
+          key: test_list
+        - name: prompt
+          source: Mbpp
+          key: prompt
+        - name: plus_tc
+          source: Mbpp
+          key: plus_test_list
+        - name: plus_ratio_tc
+          source: Mbpp
+          key: plus_ratio_list
+
+graph:
+  entry_point: initialize
+
+  edges:
+    - pair: [initialize, execute]
+      type: always
+    - pair: [execute, __end__]
+      type: always
+
+  nodes:
+    - name: initialize
+      chains:
+        - name: code
+          dependencies: []
+          input_keys: [prompt]
+          type: cot
+          kwargs:
+            n: 1
+            llm: !inc configs/llm/llama3_8b-greedy.yaml
+            parsers:
+              - type: code_block
+            prompt:
+              type: chat
+              kwargs:
+                body_template_paths: ["templates/cot/dp"]
+    - name: execute
+      chains:
+        - name: gold_tc_exec_code
+          dependencies: []
+          input_keys: [code, gold_tc, entry_point]
+          type: apply_template
+          key_map: { code: code, gold_tc: testcase, entry_point: entry_point }
+          kwargs:
+            template_path: templates/eval/exec_code_mbpp.txt
+        - name: gold_tc_exec_code_ratio
+          dependencies: []
+          input_keys: [code, gold_tc, entry_point]
+          type: apply_template
+          key_map: { code: code, gold_tc: testcase, entry_point: entry_point }
+          kwargs:
+            template_path: templates/eval/exec_code_mbpp_ratio.txt
+        - name: gold_tc_exec_code_plus
+          dependencies: []
+          input_keys: [code, plus_tc, entry_point]
+          type: apply_template
+          key_map: { code: code, plus_tc: testcase, entry_point: entry_point }
+          kwargs:
+            template_path: templates/eval/exec_code_plus.txt
+        - name: gold_tc_exec_code_plus_ratio
+          dependencies: []
+          input_keys: [code, plus_ratio_tc, entry_point]
+          type: apply_template
+          key_map: { code: code, plus_ratio_tc: testcase, entry_point: entry_point }
+          kwargs:
+            template_path: templates/eval/exec_code_plus.txt
+        - name: gold_tc_exec_result
+          dependencies: [gold_tc_exec_code]
+          input_keys: [gold_tc_exec_code]
+          type: execute
+          kwargs:
+            code_key: gold_tc_exec_code
+            timeout: 3
+        - name: gold_tc_exec_result_ratio
+          dependencies: [gold_tc_exec_code_ratio]
+          input_keys: [gold_tc_exec_code_ratio]
+          type: execute
+          kwargs:
+            code_key: gold_tc_exec_code_ratio
+            timeout: 3
+        - name: gold_tc_exec_result_plus
+          dependencies: [gold_tc_exec_code_plus]
+          input_keys: [gold_tc_exec_code_plus]
+          type: execute
+          kwargs:
+            code_key: gold_tc_exec_code_plus
+            timeout: 3
+        - name: gold_tc_exec_result_plus_ratio
+          dependencies: [gold_tc_exec_code_plus_ratio]
+          input_keys: [gold_tc_exec_code_plus_ratio]
+          type: execute
+          kwargs:
+            code_key: gold_tc_exec_code_plus_ratio
+            timeout: 3
+        - name: passed
+          dependencies: [gold_tc_exec_result]
+          input_keys: [gold_tc_exec_result]
+          type: custom_lambda
+          kwargs:
+            src: [gold_tc_exec_result]
+            func: "lambda x: 'Exit Code: 0' in x"
+        - name: passed_plus
+          dependencies: [gold_tc_exec_result_plus]
+          input_keys: [gold_tc_exec_result_plus]
+          type: custom_lambda
+          kwargs:
+            src: [gold_tc_exec_result_plus]
+            func: "lambda x: 'Exit Code: 0' in x"

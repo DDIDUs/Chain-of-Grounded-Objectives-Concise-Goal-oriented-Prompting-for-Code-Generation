@@ -1,0 +1,5 @@
+```python
+{{ prompt }}
+```
+
+Write plan for the problem. DO NOT generate solution or test case. Package your response in ```plaintext ... ```.

@@ -1,0 +1,6 @@
+```python
+{{ prompt }}
+{{ starter_code }}
+```
+
+Write plan for the problem. Package your response in ```plaintext ... ```.

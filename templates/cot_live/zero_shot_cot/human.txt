@@ -1,0 +1,10 @@
+```python
+{{ prompt }}
+{{ starter_code }}
+```
+
+###chain of thought
+
+###code
+
+Think step by step, then write the solution. DO NOT generate any example or test cases. Package your response in ```python ... ```.

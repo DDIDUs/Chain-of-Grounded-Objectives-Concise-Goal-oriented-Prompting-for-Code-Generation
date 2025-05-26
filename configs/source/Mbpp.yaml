@@ -1,0 +1,5 @@
+name: Mbpp
+type: json
+kwargs:
+  path: data/mbpp.json
+  sort_key: id

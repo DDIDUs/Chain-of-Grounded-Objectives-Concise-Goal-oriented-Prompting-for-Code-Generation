@@ -1,0 +1,11 @@
+tmp = '''
+{{ code }}
+'''
+
+tcs = {{ testcase }}
+
+for tc in tcs:
+    try:
+        exec(tmp + '\n' + tc)
+    except Exception as e:
+        print(f"Test Failed")

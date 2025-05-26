@@ -1,0 +1,6 @@
+```python
+{{ prompt }}
+{{ starter_code }}
+```
+
+Write all requirements for the problem. Package your response in ```plaintext ... ```.

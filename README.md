@@ -10,13 +10,18 @@ Official implementation of the paper 'Chain-of-Grounded-Objectives: Concise-Goal
 
 ### Setup
 
-1. **Clone the repository**
-2. **Install dependencies:**
+1. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    pip install -e third_party/expand_langchain
    pip install vllm==0.6.2
    ```
+
+2. **Run CodeExecContainer:**
+   ```bash
+   source third_party/CodeExecContainer/run.sh
+   ```
+   At a new terminal, run the following command and keep it running.
 
 3. **Configure API keys:**  
    Edit `api_keys.json` with your API keys and endpoints.

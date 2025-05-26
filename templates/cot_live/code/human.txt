@@ -1,0 +1,6 @@
+```python
+{{ prompt }}
+{{ starter_code }}
+```
+
+Write a python code for the problem. Package your code in ```python ... ```.

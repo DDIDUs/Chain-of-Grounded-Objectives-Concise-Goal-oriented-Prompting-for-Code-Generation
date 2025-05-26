@@ -1,0 +1,7 @@
+{
+  "OPEN_WEBUI_API_KEY": "sk-your_key",
+  "OLLAMA_BASE_URL": "http://localhost:11434/",
+  "VLLM_BASE_URL": "http://localhost:8001/v1/",
+  "OPENAI_API_KEY": "sk-your_key",
+  "CODEEXEC_ENDPOINT": "http://localhost:5097/execute"
+}

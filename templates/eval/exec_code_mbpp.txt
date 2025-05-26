@@ -1,0 +1,8 @@
+tmp = '''
+{{ code }}
+'''
+
+tcs = {{ testcase }}
+
+for tc in tcs:
+    exec(tmp + '\n' + tc)

@@ -1,0 +1,125 @@
+source:
+  - name: LivecodeBench
+    type: huggingface
+    kwargs:
+      path: livecodebench/code_generation
+      sort_key: question_id
+      split: test
+
+dataset:
+  - name: target
+    type: dict
+    kwargs:
+      primary_key: id
+      fields:
+        - name: id
+          source: LivecodeBench
+          key: question_id
+        - name: prompt
+          source: LivecodeBench
+          key: question_content
+        - name: entry_point
+          source: LivecodeBench
+          key: metadata
+        - name: starter_code
+          source: LivecodeBench
+          key: starter_code
+        - name: gold_tc
+          source: LivecodeBench
+          key: public_test_cases
+
+graph:
+  entry_point: initialize
+
+  edges:
+    - pair: [initialize, execute]
+      type: always
+    - pair: [execute, __end__]
+      type: always
+
+  nodes:
+    - name: initialize
+      chains:
+        - name: requirements
+          dependencies: []
+          input_keys: [prompt, starter_code]
+          type: cot_live
+          kwargs:
+            n: 1
+            llm: !inc configs/llm/llama3.1_8b-greedy.yaml
+            parsers:
+              - type: code_block
+            prompt:
+              type: chat
+              kwargs:
+                body_template_paths: ["templates/cot_live/requirements"]
+        - name: pseudo
+          dependencies: [requirements]
+          input_keys: [prompt, starter_code, requirements]
+          type: cot_live
+          kwargs:
+            n: 1
+            llm: !inc configs/llm/llama3.1_8b-greedy.yaml
+            parsers:
+              - type: code_block
+            prompt:
+              type: chat
+              kwargs:
+                body_template_paths: ["templates/cot_live/requirements", "templates/cot_live/pseudo"]
+        - name: code
+          dependencies: [pseudo]
+          input_keys: [prompt, starter_code, requirements, pseudo]
+          type: cot_live
+          kwargs:
+            n: 1
+            llm: !inc configs/llm/llama3.1_8b-greedy.yaml
+            parsers:
+              - type: code_block
+            prompt:
+              type: chat
+              kwargs:
+                body_template_paths: ["templates/cot_live/pseudo", "templates/cot_live/requirements","templates/cot_live/code"]
+    - name: execute
+      chains:
+        - name: gold_tc_exec_code
+          dependencies: []
+          input_keys: [code, gold_tc, entry_point]
+          type: apply_template
+          key_map: { code: code, gold_tc: testcase, entry_point: entry_point }
+          kwargs:
+            template_path: templates/eval/exec_code_live.txt
+        - name: gold_tc_exec_code_p
+          dependencies: []
+          input_keys: [code, gold_tc, entry_point]
+          type: apply_template
+          key_map: { code: code, gold_tc: testcase, entry_point: entry_point }
+          kwargs:
+            template_path: templates/eval/exec_code_live_ratio.txt
+        - name: gold_tc_exec_result
+          dependencies: [gold_tc_exec_code]
+          input_keys: [gold_tc_exec_code]
+          type: execute
+          kwargs:
+            code_key: gold_tc_exec_code
+            timeout: 3
+        - name: gold_tc_exec_result_p
+          dependencies: [gold_tc_exec_code_p]
+          input_keys: [gold_tc_exec_code_p]
+          type: execute
+          kwargs:
+            code_key: gold_tc_exec_code_p
+            timeout: 3
+        - name: passed
+          dependencies: [gold_tc_exec_result]
+          input_keys: [gold_tc_exec_result]
+          type: custom_lambda
+          kwargs:
+            src: [gold_tc_exec_result]
+            func: "lambda x: 'Exit Code: 0' in x"
+        - name: passed
+          dependencies: [gold_tc_exec_result]
+          input_keys: [gold_tc_exec_result]
+          type: custom_lambda
+          kwargs:
+            src: [gold_tc_exec_result]
+            func: "lambda x: 'Exit Code: 0' in x"

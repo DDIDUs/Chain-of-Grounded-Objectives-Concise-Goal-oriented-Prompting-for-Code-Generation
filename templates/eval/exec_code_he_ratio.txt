@@ -1,0 +1,9 @@
+{{ code }}
+
+def check(candidate):
+    try:
+        {{ testcase }}
+    except:
+        print(f"Test Failed")
+
+check({{ entry_point }})

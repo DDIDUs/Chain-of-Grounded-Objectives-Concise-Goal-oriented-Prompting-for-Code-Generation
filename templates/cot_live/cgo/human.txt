@@ -1,0 +1,6 @@
+```python
+{{ prompt }}
+{{ starter_code }}
+```
+
+Write core objectives to solve the problem. DO NOT generate solution or test case. Package your response in ```plaintext ... ```.

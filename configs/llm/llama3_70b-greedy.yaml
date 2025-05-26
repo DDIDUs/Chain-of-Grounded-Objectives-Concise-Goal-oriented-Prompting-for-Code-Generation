@@ -1,0 +1,5 @@
+max_tokens: 3900
+model: meta-llama/Meta-Llama-3-70B-Instruct
+platform: vllm
+temperature: 0
+top_p: 1

@@ -1,0 +1,55 @@
+### Instruction : Write a Chain of thought for the problem. Package your code in ```plaintext ... ```.
+
+
+### Input:
+class Solution:
+    def func(nums: List[int], target: int) -> List[int]:
+        """
+        Find the longest subarray of the given array `nums` such that the sum of its elements is less than or equal to the given `target`.
+        >>> func([3, 1, 5, 2, 1, 9, 7, 4], 10)
+        [3, 1, 5]
+        >>> func([1, 2, 3, 4, 5], 3)
+        [1, 2]
+        """
+
+### Chain of thought:
+Understand the Problem: Find the longest subarray with a sum ≤ target.
+Choose Approach: Use a sliding window for efficient computation.
+Implementation: Expand the window by moving the end pointer, shrink it by moving the start pointer when the sum exceeds the target, and track the longest subarray.
+Edge Cases: Handle empty arrays or cases with no valid subarray.
+
+### Output:
+class Solution:
+    def func(nums: List[int], target: int) -> List[int]:
+        """
+        Find the longest subarray of the given array `nums` such that the sum of its elements is less than or equal to the given `target`.
+        >>> func([3, 1, 5, 2, 1, 9, 7, 4], 10)
+            [3, 1, 5]
+        >>> func([1, 2, 3, 4, 5], 3)
+            [1, 2]
+        """
+        start = 0
+        current_sum = 0
+        max_length = 0
+        result = []
+
+        for end in range(len(nums)):
+            current_sum += nums[end]
+
+            # Shrink the window if the sum exceeds the target
+            while current_sum > target and start <= end:
+                current_sum -= nums[start]
+                start += 1
+
+            # Update the longest subarray
+            if end - start + 1 > max_length:
+                max_length = end - start + 1
+                result = nums[start:end + 1]
+
+        return result
+
+###Input
+```python
+{{ prompt }}
+{{ starter_code }}
+```

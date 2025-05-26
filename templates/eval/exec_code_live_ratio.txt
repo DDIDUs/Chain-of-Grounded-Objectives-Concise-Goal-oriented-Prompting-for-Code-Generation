@@ -1,0 +1,95 @@
+from io import StringIO
+import sys, ast
+import inspect
+from typing import *
+
+test_cases = [{{ testcase }}]
+metadata = {{ entry_point }}
+
+def parse_input(raw_input, func):
+    sig = inspect.signature(func)
+    params = list(sig.parameters.values())
+
+    # raw_input을 줄 단위로 분리
+    lines = raw_input.split("\n")
+
+    # 각 매개변수에 입력 데이터를 매핑
+    inputs = []
+    for i, param in enumerate(params):
+        if i >= len(lines):  # 입력이 부족할 경우 예외 처리
+            raise ValueError(f"Not enough input values for the parameters: {param.name}")
+
+        if param.annotation == List[str]:  # List[str]인 경우
+            inputs.append(ast.literal_eval(lines[i]))
+        elif param.annotation == List[List[int]]:  # List[List[int]]인 경우
+            inputs.append(ast.literal_eval(lines[i]))
+        elif param.annotation == List[int]:  # List[int]인 경우
+            inputs.append(ast.literal_eval(lines[i]))
+        elif param.annotation == str:  # str인 경우
+            inputs.append(ast.literal_eval(lines[i]))
+        elif param.annotation == int:  # int인 경우
+            inputs.append(int(lines[i]))
+        else:
+            raise ValueError(f"Unsupported parameter type: {param.annotation}")
+
+    return tuple(inputs)
+
+for case in test_cases:
+    try:
+        testtype = case["testtype"]
+        input_data = case["input"]
+        expected_output = case["output"]
+        
+        if testtype == "functional":
+            try:
+                source_code = '''{{ code }}'''
+    
+                exec(source_code)
+                solution = Solution()
+                method_to_call = getattr(solution, metadata["func_name"])
+    
+                parsed_inputs = parse_input(input_data, method_to_call)
+    
+                result = method_to_call(*parsed_inputs)
+            
+                if isinstance(expected_output, str):
+                    # 예상 출력이 문자열일 경우
+                    if expected_output.lower() == "true":
+                        expected_output = True
+                    elif expected_output.lower() == "false":
+                        expected_output = False
+                    else:
+                        expected_output = ast.literal_eval(expected_output)
+                    assert result == expected_output, f"Test {case} Failed: Output: {result} Answer: {expected_output}"
+                elif isinstance(expected_output, int):
+                    # 예상 출력이 정수일 경우
+                    assert result == expected_output, f"Test {case} Failed: Output: {result} Answer: {expected_output}"
+                elif isinstance(expected_output, list):
+                    # 예상 출력이 리스트일 경우
+                    expected_output = ast.literal_eval(expected_output)  # 문자열을 리스트로 변환
+                    assert result == expected_output, f"Test {case} Failed: Output: {result} Answer: {expected_output}"
+            except Exception:
+                print(f"Failed")
+                continue
+    
+        elif testtype == "stdin":
+            def check(*arg):
+            {% set lines = code.splitlines() -%}
+            {% for line in lines %}
+                {{ line }}
+            {%- endfor%}
+    
+            try:
+                sys.stdin = StringIO(input_data)
+                sys.stdout = StringIO()
+                check()  # 테스트할 함수 호출
+                result = sys.stdout.getvalue().strip()
+                assert result == expected_output.strip(), f"Failed test case: {case} Output: {result} Answer: {expected_output}"
+            except Exception as e:
+                sys.stdin = sys.__stdin__
+                sys.stdout = sys.__stdout__
+                print(f"Failed")
+                continue
+        print(f"Passed")
+    except Exception as e:
+        print(f"Failed")
